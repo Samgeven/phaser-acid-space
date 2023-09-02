@@ -1,0 +1,20 @@
+{
+  "name": "vite-phaser-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "phaser": "^3.60.0",
+    "vitest": "^0.34.3"
+  }
+}
