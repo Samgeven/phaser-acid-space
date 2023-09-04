@@ -1,7 +1,8 @@
 
 import config from './config';
-import GameScene from './src/Main';
+import GameScene from './src/scenes/Main';
+import { GameOver } from './src/scenes/GameOver'
 
 new Phaser.Game(
-  {...config, scene: GameScene}
+  {...config, scene: [GameScene, GameOver]}
 )
