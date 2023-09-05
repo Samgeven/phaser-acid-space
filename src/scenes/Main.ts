@@ -80,7 +80,7 @@ export default class Main extends Phaser.Scene {
     })
   }
 
-  update(time: number, delta: number): void {
+  update(): void {
     this.handleControls()
     const enemy = this.children.getChildren().filter(el => el.name === 'enemy') as Enemy[]
     enemy?.forEach(el => el.followPlayer())
@@ -123,7 +123,7 @@ export default class Main extends Phaser.Scene {
       frequency: 200
     };
 
-    const emitter = this.add.particles('white-particle').createEmitter(emitterConfig)
+    this.add.particles('white-particle').createEmitter(emitterConfig)
   }
 
   handleControls() {

@@ -21,7 +21,7 @@ export class Enemy extends Phaser.Physics.Matter.Image {
     this.setIgnoreGravity(true)
     this.setName('enemy')
 
-    const particles = this.scene.add.particles('particle')
+    this.scene.add.particles('particle')
 
     this.emitterConfig = {
       x: this?.x,

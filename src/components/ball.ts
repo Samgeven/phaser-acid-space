@@ -1,7 +1,6 @@
 import { COLLISION_CATEGORIES } from "../data/collision"
 import Main from "../scenes/Main"
 import { Enemy } from "./enemy"
-import { Projectile } from "./projectile"
 
 export class Ball extends Phaser.GameObjects.Image {
   scene: Main
@@ -112,24 +111,9 @@ export class Ball extends Phaser.GameObjects.Image {
   }
 
   updateAimingLine(pointer: Phaser.Input.Pointer) {
-    var bodyPosition = this.matterBall.body.position;
-
     Phaser.Geom.Line.SetToAngle(this.aimingLine, this.body.position.x, this.body.position.y, Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, pointer.x, pointer.y), 15);
-
-    // Clear the previous line
     this.aimGraphics.clear();
-
-    // Set the line style
     this.aimGraphics.lineStyle(5, 0xffffff, 0.5)// Adjust the line color and thickness as needed
-
-    // Draw the aiming line
-    // this.aimGraphics.strokeLineShape(this.aimingLine);
     this.aimGraphics.strokeCircle(this.aimingLine.x2, this.aimingLine.y2, 3).setDepth(3)
   }
-
-  // shootProjectile(pointer: Phaser.Input.Pointer) {
-  //   // Calculate the angle between the body and the cursor
-  //   var angle = Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, pointer.x, pointer.y);
-  //   new Projectile(this.scene, angle, this)
-  // }
 }

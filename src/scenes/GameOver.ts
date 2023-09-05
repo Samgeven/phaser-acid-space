@@ -1,4 +1,3 @@
-import { LEFT } from "phaser"
 import { Button } from "../components/ui/button"
 
 type Stats = {
