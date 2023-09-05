@@ -2,9 +2,10 @@ import Phaser from 'phaser';
 import { Ball } from '../components/ball';
 import { Enemy } from '../components/enemy';
 import { EnemyGenerator } from '../components/enemy-generator';
-import { WeaponPanel } from '../components/weapon-panel';
-import { WeaponSlot } from '../components/weapon-slot';
+import { WeaponPanel } from '../components/ui/weapon-panel';
+import { WeaponSlot } from '../components/ui/weapon-slot';
 import { COLLISION_CATEGORIES } from '../data/collision';
+import { StatsManager } from '../components/stats-manager';
 
 export default class Main extends Phaser.Scene {
   ball?: Ball
@@ -14,6 +15,9 @@ export default class Main extends Phaser.Scene {
   }
   slotA?: WeaponSlot
   hpInfo?: Phaser.GameObjects.Text
+  generator?: EnemyGenerator
+  statsManager?: StatsManager
+
   constructor() {
     super('GameScene');
   }
@@ -53,17 +57,24 @@ export default class Main extends Phaser.Scene {
     })
     
     this.ball = new Ball(this)
-    const generator = new EnemyGenerator(this)
-    generator.start()
+    this.generator = new EnemyGenerator(this)
+    this.generator.start()
 
     const weaponSlot = new WeaponSlot(this, 0, 0, 'peagun', 500)
     new WeaponPanel(this, [weaponSlot])
     this.slotA = weaponSlot
 
+    this.statsManager = new StatsManager(this)
+
     this.hpInfo = this.add.text(40, 40, `Hp: ${this.ball.hp}`, { fontSize: '24px' })
     this.events.on('hp-lost', (current: number) => {
       if (current < 1) {
-        this.scene.start('game-over')
+        this.generator?.stop()
+        this.cameras.main.zoomTo(0.2, 1000, undefined, undefined, (_, progress) => {
+          if (progress === 1) {
+            this.scene.start('game-over', this.statsManager?.getStats())
+          }
+        })
       }
       this.hpInfo?.setText(`Hp: ${current}`)
     })
@@ -99,16 +110,16 @@ export default class Main extends Phaser.Scene {
 
   setBackgroundEmitter() {
     const emitterConfig = {
-      x: this.game.scale.width + 100, // Initial x position of the emitter
-      y: { min: 0, max: this.game.scale.height }, // Initial y position of the emitter
-      speed: { min: 150, max: 200 }, // Speed range for particles
-      angle: 0, // Angle range for particles
-      gravityY: 0, // Set gravity to zero for particles to move horizontally
+      x: this.game.scale.width + 100,
+      y: { min: 0, max: this.game.scale.height },
+      speed: { min: 150, max: 200 },
+      angle: 0,
+      gravityY: 0,
       gravityX: -500,
-      lifespan: 10000, // Lifespan of particles in milliseconds
-      blendMode: 'ADD', // Blend mode for particles
-      scale: { min: 0.5, max: 2 }, // Scale range for particles
-      alpha: { min: 0.1, max: 0.3 }, // Alpha range for particles
+      lifespan: 10000,
+      blendMode: 'ADD',
+      scale: { min: 0.5, max: 2 },
+      alpha: { min: 0.1, max: 0.3 },
       frequency: 200
     };
 

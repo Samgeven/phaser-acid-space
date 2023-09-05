@@ -1,5 +1,5 @@
-import { Ball } from "./ball";
-import { Projectile } from "./projectile";
+import { Ball } from "../ball";
+import { Projectile } from "../projectile";
 
 export class WeaponSlot extends Phaser.GameObjects.Container {
   public icon: Phaser.GameObjects.Image;

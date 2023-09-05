@@ -62,10 +62,9 @@ export class Enemy extends Phaser.Physics.Matter.Image {
 
   followPlayer() {
     if (this.isDisabled) {
-      console.log('yay')
       return
     }
-    // Get the player's position
+
     const player = this.scene.children.getByName('ball') as Ball
 
     if (!player || this.isFading) {
@@ -75,21 +74,11 @@ export class Enemy extends Phaser.Physics.Matter.Image {
     const playerX = player.x;
     const playerY = player.y;
 
-    // Calculate the angle towards the player
     const angle = Phaser.Math.Angle.Between(this.x, this.y, playerX, playerY);
 
-    // Calculate the velocity towards the player
     const velocityX = Math.cos(angle) * this.speed;
     const velocityY = Math.sin(angle) * this.speed;
 
-    // Set the velocity of the enemy
     this.setVelocity(velocityX, velocityY);
-  }
-
-  handleCollisionWithPlayer() {
-    // Perform actions when the enemy collides with the player
-    // For example, reduce player's health, play sound, etc.
-    // player.reduceHealth(10);
-    console.log('collision')
   }
 }
