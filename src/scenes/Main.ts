@@ -6,6 +6,7 @@ import { WeaponPanel } from '../components/ui/weapon-panel';
 import { WeaponSlot } from '../components/ui/weapon-slot';
 import { COLLISION_CATEGORIES } from '../data/collision';
 import { StatsManager } from '../components/stats-manager';
+import { CollisionManager } from '../components/collision-manager';
 
 export default class Main extends Phaser.Scene {
   ball?: Ball
@@ -17,6 +18,7 @@ export default class Main extends Phaser.Scene {
   hpInfo?: Phaser.GameObjects.Text
   generator?: EnemyGenerator
   statsManager?: StatsManager
+  collisionManager?: CollisionManager
 
   constructor() {
     super('GameScene');
@@ -65,6 +67,7 @@ export default class Main extends Phaser.Scene {
     this.slotA = weaponSlot
 
     this.statsManager = new StatsManager(this)
+    this.collisionManager = new CollisionManager(this)
 
     this.hpInfo = this.add.text(40, 40, `Hp: ${this.ball.hp}`, { fontSize: '24px' })
     this.events.on('hp-lost', (current: number) => {

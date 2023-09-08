@@ -1,6 +1,5 @@
 import { COLLISION_CATEGORIES } from "../data/collision"
 import Main from "../scenes/Main"
-import { Enemy } from "./enemy"
 
 export class Ball extends Phaser.GameObjects.Image {
   scene: Main
@@ -41,38 +40,17 @@ export class Ball extends Phaser.GameObjects.Image {
     this.aimGraphics = scene.add.graphics()
 
     this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      // Update the aiming line
       this.updateAimingLine(pointer);
     }, this);
 
-    this.matterBall.setOnCollide(function(this: MatterJS.BodyType, e: Phaser.Types.Physics.Matter.MatterCollisionData) {
-      const ball = this?.gameObject as Ball
-      const enemy = e?.bodyB?.gameObject as Enemy
-
-      if (!(enemy instanceof Enemy) || ball.isInvincible) {
-        return
-      }
-      const forceMultiplier = 5
-
-      const impulse = {
-        x: enemy.x - enemy.x,
-        y: enemy.y - enemy.y,
-      };
-
-      const length = Math.sqrt(impulse.x ** 2 + impulse.y ** 2);
-      impulse.x *= forceMultiplier / length;
-      impulse.y *= forceMultiplier / length;
-
-      ball.reduceHp()
-      ball.matterBall.applyForce(impulse as Phaser.Math.Vector2)
-      enemy.setDisabled()
-      enemy.applyForce(impulse as Phaser.Math.Vector2)
+    this.matterBall.setOnCollide((e: Phaser.Types.Physics.Matter.MatterCollisionData) => {
+      this.scene.collisionManager?.handleInteractions(e)
     })
   }
 
   addEmitter() {
     const particles = this.scene.add.particles('particle').setDepth(1)
-    // Configure the emitter properties
+
     this.emitter = particles.createEmitter({
       x: this.x,
       y: this.y,
@@ -113,7 +91,7 @@ export class Ball extends Phaser.GameObjects.Image {
   updateAimingLine(pointer: Phaser.Input.Pointer) {
     Phaser.Geom.Line.SetToAngle(this.aimingLine, this.body.position.x, this.body.position.y, Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, pointer.x, pointer.y), 15);
     this.aimGraphics.clear();
-    this.aimGraphics.lineStyle(5, 0xffffff, 0.5)// Adjust the line color and thickness as needed
+    this.aimGraphics.lineStyle(5, 0xffffff, 0.5)
     this.aimGraphics.strokeCircle(this.aimingLine.x2, this.aimingLine.y2, 3).setDepth(3)
   }
 }
