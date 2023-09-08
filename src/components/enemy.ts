@@ -43,6 +43,7 @@ export class Enemy extends Phaser.Physics.Matter.Image {
     this.isFading = true
     this.setCollisionCategory(5)
     this.setCollisionGroup(5)
+    this.scene.events.emit('enemy-killed')
 
     const particles = this.scene.add.particles('particle')
     const emitter = particles.createEmitter(this.emitterConfig)
