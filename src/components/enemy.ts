@@ -6,6 +6,7 @@ export class Enemy extends Phaser.Physics.Matter.Image {
   isFading: boolean = false
   emitterConfig: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
   isDisabled: boolean = false
+  killBounty: number = 40
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene.matter.world, x, y, 'shell', undefined, {
@@ -43,7 +44,7 @@ export class Enemy extends Phaser.Physics.Matter.Image {
     this.isFading = true
     this.setCollisionCategory(5)
     this.setCollisionGroup(5)
-    this.scene.events.emit('enemy-killed')
+    this.scene.events.emit('enemy-killed', this.killBounty)
 
     const particles = this.scene.add.particles('particle')
     const emitter = particles.createEmitter(this.emitterConfig)

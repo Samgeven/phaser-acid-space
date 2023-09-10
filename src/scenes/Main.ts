@@ -7,6 +7,7 @@ import { WeaponSlot } from '../components/ui/weapon-slot';
 import { COLLISION_CATEGORIES } from '../data/collision';
 import { StatsManager } from '../components/stats-manager';
 import { CollisionManager } from '../components/collision-manager';
+import { StatusPanel } from '../components/ui/status-panel';
 
 export default class Main extends Phaser.Scene {
   ball?: Ball
@@ -15,10 +16,10 @@ export default class Main extends Phaser.Scene {
     [key: string]: Phaser.Input.Keyboard.Key
   }
   slotA?: WeaponSlot
-  hpInfo?: Phaser.GameObjects.Text
   generator?: EnemyGenerator
   statsManager?: StatsManager
   collisionManager?: CollisionManager
+  statusPanel?: StatusPanel
 
   constructor() {
     super('GameScene');
@@ -30,6 +31,8 @@ export default class Main extends Phaser.Scene {
     this.load.image('white-particle', 'assets/white-particle.png');
     this.load.image('shell', 'assets/enemies/shell.svg');
     this.load.image('peagun', 'assets/weapons/peagun.svg');
+    this.load.image('level-icon', 'assets/level-icon.svg');
+    this.load.image('hp-chunk', 'assets/hp-chunk.svg');
   }
 
   create() {
@@ -68,19 +71,9 @@ export default class Main extends Phaser.Scene {
 
     this.statsManager = new StatsManager(this)
     this.collisionManager = new CollisionManager(this)
+    this.statusPanel = new StatusPanel(this, 3)
 
-    this.hpInfo = this.add.text(40, 40, `Hp: ${this.ball.hp}`, { fontSize: '24px' })
-    this.events.on('hp-lost', (current: number) => {
-      if (current < 1) {
-        this.generator?.stop()
-        this.cameras.main.zoomTo(0.2, 1000, undefined, undefined, (_, progress) => {
-          if (progress === 1) {
-            this.scene.start('game-over', this.statsManager?.getStats())
-          }
-        })
-      }
-      this.hpInfo?.setText(`Hp: ${current}`)
-    })
+    this.bindEvents()
   }
 
   update(): void {
@@ -152,5 +145,31 @@ export default class Main extends Phaser.Scene {
     }
 
     this?.ball?.updateAimingLine(this.input.activePointer)
+  }
+
+  bindEvents() {
+    this.events.on('enemy-killed', (bounty: number) => {
+      this.statsManager?.enemyKillCount && this.statsManager.enemyKillCount++
+      this.statusPanel?.gainExp(bounty)
+    })
+
+    this.events.on('hp-lost', (current: number) => {
+      if (current < 1) {
+        this.generator?.stop()
+        this.cameras.main.zoomTo(0.2, 1000, undefined, undefined, (_, progress) => {
+          if (progress === 1) {
+            this.scene.start('game-over', this.statsManager?.getStats())
+          }
+        })
+      }
+
+      this.statusPanel?.decreaseHp()
+    })
+
+    this.events.on('level-up', () => {
+      this.statusPanel?.gainLevel()
+      this.scene.pause()
+      this.scene.launch('level-up')
+    })
   }
 }

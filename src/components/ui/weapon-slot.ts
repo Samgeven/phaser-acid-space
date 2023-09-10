@@ -1,3 +1,4 @@
+import Main from "../../scenes/Main";
 import { Ball } from "../ball";
 import { Projectile } from "../projectile";
 
@@ -7,7 +8,7 @@ export class WeaponSlot extends Phaser.GameObjects.Container {
   private cooldownTimer: Phaser.Time.TimerEvent | null;
   private cooldownDuration: number
 
-  constructor(scene: Phaser.Scene, x: number, y: number, iconKey: string, cooldownDuration: number) {
+  constructor(scene: Main, x: number, y: number, iconKey: string, cooldownDuration: number) {
     super(scene, 0, 0);
     scene.add.existing(this);
 

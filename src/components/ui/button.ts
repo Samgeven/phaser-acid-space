@@ -27,7 +27,7 @@ export class Button extends Phaser.GameObjects.Container {
     super(scene, x, y)
 
     const textNode = scene.add.text(0, 0, text, { fontSize: FONT_SIZE, fontFamily: 'Arial' }).setOrigin(0.5)
-    const rect = scene.add.rectangle(0, 0, textNode.width + PAD_X, textNode.height + PAD_Y, 0xFF2929)
+    const rect = scene.add.rectangle(0, 0, textNode.width + PAD_X, textNode.height + PAD_Y, 0xFF3688)
 
     rect.setInteractive()
       .on('pointerdown', () => clickHandler())
