@@ -5,5 +5,5 @@ import { GameOver } from './src/scenes/GameOver'
 import { LevelUp } from './src/scenes/LevelUp'
 
 new Phaser.Game(
-  {...config, scene: [GameScene, GameOver, LevelUp]}
+  {...config, scene: [GameScene, LevelUp, GameOver]}
 )

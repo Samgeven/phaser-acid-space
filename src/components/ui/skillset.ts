@@ -1,10 +1,12 @@
-import { LevelUp } from "../../scenes/LevelUp"
+import { LevelUp } from '../../scenes/LevelUp'
+import { SKILLS, TYPE_TO_COLOR_MAP } from '../../data/skills'
+import { Badge } from './badge'
 
 type SkillsetConfig = {
-  scene: LevelUp,
-  x: number,
-  y: number,
-  skills: string[]
+  scene: LevelUp
+  x: number
+  y: number
+  skills: Array<keyof typeof SKILLS>
 }
 
 export class Skillset extends Phaser.GameObjects.Container {
@@ -13,7 +15,7 @@ export class Skillset extends Phaser.GameObjects.Container {
     super(scene, x, y)
 
     const baseWidth = 150
-    const padding = 80
+    const padding = 110
 
     skills.forEach((el, i) => {
       const x = baseWidth * i + padding * i
@@ -25,18 +27,53 @@ export class Skillset extends Phaser.GameObjects.Container {
     this.scene = scene
   }
 
-  addSkill(key: string, x: number, y: number) {
-    const skillWrap = this.scene.add.container(x, y).setName(key)
-    const icon = this.scene.add.image(0, 0, 'peagun').setOrigin(0)
-    const text = this.scene.add.text(0, -32, key, { fontSize: '24px', fontFamily: 'Arial' }).setOrigin(0, 0)
+  addSkill(key: keyof typeof SKILLS, x: number, y: number) {
+    const { title, description, type, iconTexture } = SKILLS[key]
 
-    skillWrap.add([icon, text])
+    const skillWrap = this.scene.add.container(x, y).setName(title)
+    const icon = this.scene.add.image(0, 0, iconTexture).setOrigin(0)
+    const text = this.scene.add.text(75, -32, title, { fontSize: '24px', fontFamily: 'Arial' }).setOrigin(0.5, 0)
+    const badge = new Badge({
+      scene: this.scene,
+      x: 75,
+      y: 180,
+      text: type,
+      color: TYPE_TO_COLOR_MAP[type],
+    })
+
+    const descriptionNode = this.scene.add.text(icon.width / 2, 228, description, {
+      wordWrap: { width: 240 },
+      align: 'center',
+      fontSize: '20px',
+      fontFamily: 'Arial',
+    }).setOrigin(0.5, 0)
+
+    const light = this.scene.add.pointlight(75, 64, TYPE_TO_COLOR_MAP[type], 120, 0.5, 0.05)
+
+    skillWrap.add([icon, text, badge, descriptionNode, light])
     this.scene.add.existing(skillWrap)
     this.add(skillWrap)
 
-    icon.setInteractive().on('pointerdown', () => {
-      const scene = this.scene as LevelUp
-      scene.continueGame()
-    })
+    const runIconHoverTween = (radius: number) => {
+      return this.scene.add.tween({
+        paused: true,
+        targets: light,
+        radius: radius,
+        duration: 400,
+      })
+    }
+
+    icon
+      .setInteractive()
+      .on('pointerdown', () => {
+        const scene = this.scene as LevelUp
+        scene.continueGame(key)
+      })
+      .on('pointerover', () => {
+        runIconHoverTween(150).play()
+      })
+      .on('pointerout', () => {
+        runIconHoverTween(120).play()
+      })
   }
 }

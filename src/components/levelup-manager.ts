@@ -1,7 +1,7 @@
 type Ability = {
-  title: string,
-  ranks: number[],
-  description: string,
+  title: string
+  ranks: number[]
+  description: string
   icon: string
 }
 

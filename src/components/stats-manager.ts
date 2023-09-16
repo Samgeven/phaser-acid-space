@@ -10,7 +10,7 @@ export class StatsManager {
   getStats() {
     return {
       timePassed: this.timePassed,
-      enemiesKilled: this.enemyKillCount
+      enemiesKilled: this.enemyKillCount,
     }
   }
 }

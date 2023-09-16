@@ -4,12 +4,12 @@ export class CollisionManager {
     BALL: 1,
     ENEMIES: 2,
     PROJECTILES: 4,
-    WALLS: 8
+    WALLS: 8,
   }
   INTERACTIONS = {
     UNNKNOWN: 0,
     BALL_AND_ENEMY: 1,
-    PROJECTILE_AND_ENEMY: 2
+    PROJECTILE_AND_ENEMY: 2,
   }
 
   constructor(scene: Phaser.Scene) {
@@ -61,7 +61,7 @@ export class CollisionManager {
         onComplete: () => {
           bodyA?.destroy()
         },
-        targets: [bodyA]
+        targets: [bodyA],
       })
     }
   }

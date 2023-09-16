@@ -1,4 +1,4 @@
-import Main from "../../scenes/Main"
+import Main from '../../scenes/Main'
 
 export class StatusPanel extends Phaser.GameObjects.Container {
   hpChunks: Phaser.GameObjects.Image[] = []
@@ -17,7 +17,9 @@ export class StatusPanel extends Phaser.GameObjects.Container {
     this.levelText = levelCounter
 
     const levelBar = scene.add.rectangle(48, -40, 400, 5, 0xffffff).setOrigin(0)
-    const levelBarFilled = scene.add.rectangle(48, -40, levelBar.width / 100 * this.currentExp, 5, 0x00C6BB).setOrigin(0)
+    const levelBarFilled = scene.add
+      .rectangle(48, -40, (levelBar.width / 100) * this.currentExp, 5, 0x00c6bb)
+      .setOrigin(0)
     this.levelFill = levelBarFilled
     this.levelBar = levelBar
 
@@ -39,7 +41,7 @@ export class StatusPanel extends Phaser.GameObjects.Container {
       duration: 600,
       onComplete: () => {
         lastChunk?.destroy()
-      }
+      },
     })
   }
 
@@ -48,12 +50,12 @@ export class StatusPanel extends Phaser.GameObjects.Container {
 
     if (this.maxExp <= this.currentExp) {
       this.currentExp = this.currentExp - this.maxExp
-      this.levelFill.width = this.levelBar.width / 100 * this.currentExp
+      this.levelFill.width = (this.levelBar.width / 100) * this.currentExp
       this.scene.events.emit('level-up')
       return
     }
 
-    this.levelFill.width = this.levelBar.width / 100 * this.currentExp
+    this.levelFill.width = (this.levelBar.width / 100) * this.currentExp
   }
 
   gainLevel() {

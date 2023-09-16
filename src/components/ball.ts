@@ -1,5 +1,5 @@
-import { COLLISION_CATEGORIES } from "../data/collision"
-import Main from "../scenes/Main"
+import { COLLISION_CATEGORIES } from '../data/collision'
+import Main from '../scenes/Main'
 
 export class Ball extends Phaser.GameObjects.Image {
   scene: Main
@@ -8,7 +8,14 @@ export class Ball extends Phaser.GameObjects.Image {
   aimingLine: Phaser.Geom.Line
   isInvincible: boolean = false
   emitter?: Phaser.GameObjects.Particles.ParticleEmitter
-  hp: number = 3
+  stats = {
+    hp: {
+      max: 3,
+      current: 3,
+    },
+    precision: 0.1,
+    speed: 7,
+  }
 
   constructor(scene: Main) {
     super(scene, 200, 200, 'ball')
@@ -20,11 +27,11 @@ export class Ball extends Phaser.GameObjects.Image {
       label: 'ball',
       collisionFilter: {
         category: COLLISION_CATEGORIES.BALL,
-        mask: COLLISION_CATEGORIES.ENEMIES | COLLISION_CATEGORIES.WALLS
-      }
+        mask: COLLISION_CATEGORIES.ENEMIES | COLLISION_CATEGORIES.WALLS,
+      },
     })
     const matterBall = scene.matter.add.gameObject(this, body) as Phaser.Physics.Matter.Sprite
-    
+
     const matterImage = matterBall as Phaser.Physics.Matter.Image
     this.matterBall = matterImage
 
@@ -36,16 +43,22 @@ export class Ball extends Phaser.GameObjects.Image {
     this.setName('ball')
     this.addEmitter()
 
-    this.aimingLine = new Phaser.Geom.Line();
+    this.aimingLine = new Phaser.Geom.Line()
     this.aimGraphics = scene.add.graphics()
 
-    this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      this.updateAimingLine(pointer);
-    }, this);
+    this.scene.input.on(
+      'pointermove',
+      (pointer: Phaser.Input.Pointer) => {
+        this.updateAimingLine(pointer)
+      },
+      this
+    )
 
     this.matterBall.setOnCollide((e: Phaser.Types.Physics.Matter.MatterCollisionData) => {
       this.scene.collisionManager?.handleInteractions(e)
     })
+
+    this.changeSize(1.2)
   }
 
   addEmitter() {
@@ -56,18 +69,18 @@ export class Ball extends Phaser.GameObjects.Image {
       y: this.y,
       lifespan: 140,
       speed: { min: 100, max: 200 },
-      scale: { start: 5, end: 0 },
+      scale: { start: 5 * this.scale, end: 0 },
       quantity: 1,
       blendMode: 'ADD',
       timeScale: 0.6,
       follow: this,
     })
   }
-  
+
   setInvincible(duration: number = 7) {
     this.isInvincible = true
     console.log(this.emitter?.tint)
-    this.emitter?.setTint(0xFF2929)
+    this.emitter?.setTint(0xff2929)
 
     this.scene.tweens.add({
       repeat: duration,
@@ -77,21 +90,40 @@ export class Ball extends Phaser.GameObjects.Image {
       duration: 100,
       onComplete: () => {
         this.isInvincible = false
-        this.emitter?.setTint(0xFF7629)
-      }
+        this.emitter?.setTint(0xff7629)
+      },
     })
   }
 
   reduceHp() {
-    this.hp = this.hp - 1
-    this.scene.events.emit('hp-lost', this.hp)
+    this.stats.hp.current -= 1
+    this.scene.events.emit('hp-lost', this.stats.hp.current)
     this.setInvincible()
   }
 
   updateAimingLine(pointer: Phaser.Input.Pointer) {
-    Phaser.Geom.Line.SetToAngle(this.aimingLine, this.body.position.x, this.body.position.y, Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, pointer.x, pointer.y), 15);
-    this.aimGraphics.clear();
-    this.aimGraphics.lineStyle(5, 0xffffff, 0.5)
+    Phaser.Geom.Line.SetToAngle(
+      this.aimingLine,
+      this.body.position.x,
+      this.body.position.y,
+      Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, pointer.x, pointer.y),
+      this.scale * 15
+    )
+    this.aimGraphics.clear()
+    this.aimGraphics.lineStyle(this.scale * 5, 0xffffff, 0.5)
     this.aimGraphics.strokeCircle(this.aimingLine.x2, this.aimingLine.y2, 3).setDepth(3)
+  }
+
+  changeSize(size: number) {
+    this.setScale(size)
+    this.addEmitter()
+  }
+
+  setPrecision(value: number) {
+    this.stats.precision = value
+  }
+
+  setSpeed(value: number) {
+    this.stats.speed = value
   }
 }
