@@ -1,5 +1,6 @@
 import { Modal } from '../components/ui/modal'
 import { Skillset } from '../components/ui/skillset'
+import { SKILLS } from '../data/skills'
 
 export class LevelUp extends Phaser.Scene {
   modal?: Phaser.GameObjects.Container
@@ -48,7 +49,7 @@ export class LevelUp extends Phaser.Scene {
     })
   }
 
-  continueGame() {
+  continueGame(skillKey: keyof typeof SKILLS) {
     this.add.tween({
       targets: this.modal,
       scale: { from: 1, to: 3 },
@@ -56,7 +57,7 @@ export class LevelUp extends Phaser.Scene {
       alpha: { from: 1, to: 0.4 },
       onComplete: () => {
         this.scene.stop('level-up')
-        this.scene.run('GameScene')
+        this.scene.run('GameScene', { skillKey })
       },
     })
   }

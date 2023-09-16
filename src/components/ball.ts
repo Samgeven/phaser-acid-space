@@ -1,4 +1,5 @@
 import { COLLISION_CATEGORIES } from '../data/collision'
+import { SKILLS } from '../data/skills'
 import Main from '../scenes/Main'
 
 export class Ball extends Phaser.GameObjects.Image {
@@ -16,6 +17,7 @@ export class Ball extends Phaser.GameObjects.Image {
     precision: 0.1,
     speed: 7,
   }
+  skills: Array<keyof typeof SKILLS> = []
 
   constructor(scene: Main) {
     super(scene, 200, 200, 'ball')
