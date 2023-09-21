@@ -1,6 +1,7 @@
 import { COLLISION_CATEGORIES } from '../data/collision'
 import { SKILLS } from '../data/skills'
 import Main from '../scenes/Main'
+import { Projectile } from './projectile'
 
 export class Ball extends Phaser.GameObjects.Image {
   scene: Main
@@ -14,8 +15,11 @@ export class Ball extends Phaser.GameObjects.Image {
       max: 3,
       current: 3,
     },
-    precision: 0.1,
+    spread: 0.1,
     speed: 7,
+    invincibleDuration: 7, // number of ticks with 100ms interval
+    shootingSpeed: 400,
+    range: 400
   }
   skills: Array<keyof typeof SKILLS> = []
 
@@ -79,13 +83,12 @@ export class Ball extends Phaser.GameObjects.Image {
     })
   }
 
-  setInvincible(duration: number = 7) {
+  setInvincible() {
     this.isInvincible = true
-    console.log(this.emitter?.tint)
     this.emitter?.setTint(0xff2929)
 
     this.scene.tweens.add({
-      repeat: duration,
+      repeat: this.stats.invincibleDuration,
       yoyo: true,
       alpha: 0.1,
       targets: this.matterBall,
@@ -103,6 +106,19 @@ export class Ball extends Phaser.GameObjects.Image {
     this.setInvincible()
   }
 
+  restoreHp() {
+    if (this.stats.hp.current === this.stats.hp.max) {
+      return
+    }
+    this.stats.hp.current += 1
+    this.scene.events.emit('hp-restored', this.stats.hp.current)
+  }
+
+  setMaxHp() {
+    this.stats.hp.max =+ 1
+    this.restoreHp()
+  }
+
   updateAimingLine(pointer: Phaser.Input.Pointer) {
     Phaser.Geom.Line.SetToAngle(
       this.aimingLine,
@@ -117,15 +133,49 @@ export class Ball extends Phaser.GameObjects.Image {
   }
 
   changeSize(size: number) {
-    this.setScale(size)
+    this.setScale(this.scale * size)
     this.addEmitter()
   }
 
   setPrecision(value: number) {
-    this.stats.precision = value
+    this.stats.spread *= value
   }
 
   setSpeed(value: number) {
-    this.stats.speed = value
+    this.stats.speed *= value
+  }
+
+  shootRandomProjectiles(count: number) {
+    this.scene.time.addEvent({
+      delay: 80,
+      callback: () => {
+        const randomX = Phaser.Math.Between(0, this.scene.scale.width)
+        const randomY = Phaser.Math.Between(0, this.scene.scale.height)
+        const angle = Phaser.Math.Angle.Between(this.body.position.x, this.body.position.y, randomX, randomY)
+
+        new Projectile({
+          scene: this.scene,
+          angle: angle,
+          startingPoint: this,
+          lifespan: 400,
+          speed: 20,
+        })
+      },
+      callbackScope: this,
+      repeat: count
+    })
+  }
+  
+  setInvincibilityDuration(dur: number) {
+    this.stats.invincibleDuration = Math.floor(dur * this.stats.invincibleDuration)
+  }
+
+  setShootingSpeed(value: number) {
+    this.stats.shootingSpeed *= value
+    this.scene.events.emit('shooting-speed-update', this.stats.shootingSpeed)
+  }
+
+  setShootingRange(value: number) {
+    this.stats.range *= value
   }
 }

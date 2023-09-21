@@ -45,6 +45,17 @@ export class StatusPanel extends Phaser.GameObjects.Container {
     })
   }
 
+  restoreHp() {
+    const chunk = this.scene.add.image(120 + (this.hpChunks.length + 1) * 24, 64, 'hp-chunk')
+    this.hpChunks = [...this.hpChunks, chunk]
+    this.scene.tweens.add({
+      targets: chunk,
+      scale: { from: 2, to: 1 },
+      alpha: { from: 0, to: 1 },
+      duration: 600,
+    })
+  }
+
   gainExp(value: number) {
     this.currentExp += value
 

@@ -33,7 +33,6 @@ export class CollisionManager {
 
   handleInteractions(e: Phaser.Types.Physics.Matter.MatterCollisionData) {
     const interactionType = this.detectGroup(e)
-    console.log(interactionType)
 
     if (interactionType === this.INTERACTIONS.UNNKNOWN) {
       return

@@ -24,6 +24,10 @@ export class WeaponSlot extends Phaser.GameObjects.Container {
     this.cooldownTimer = null
     this.cooldownDuration = cooldownDuration
     scene.add.existing(this)
+
+    this.scene.events.on('shooting-speed-update', (value: number) => {
+      this.cooldownDuration = value
+    })
   }
 
   public activateSkill(pointer: Phaser.Input.Pointer): void {
@@ -33,14 +37,14 @@ export class WeaponSlot extends Phaser.GameObjects.Container {
 
     const ball = this.scene.children.getByName('ball') as Ball
     const angle = Phaser.Math.Angle.Between(ball.body.position.x, ball.body.position.y, pointer.x, pointer.y)
-    const { precision } = ball.stats
-    const aimingAngle = Phaser.Math.FloatBetween(angle - precision, angle + precision)
+    const { spread, range } = ball.stats
+    const aimingAngle = Phaser.Math.FloatBetween(angle - spread, angle + spread)
 
     new Projectile({
       scene: this.scene as Main,
       angle: aimingAngle,
       startingPoint: ball,
-      lifespan: 400,
+      lifespan: range,
       speed: 20,
     })
     this.startCooldown()

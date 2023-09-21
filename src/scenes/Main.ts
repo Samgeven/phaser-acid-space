@@ -8,6 +8,8 @@ import { COLLISION_CATEGORIES } from '../data/collision'
 import { StatsManager } from '../components/stats-manager'
 import { CollisionManager } from '../components/collision-manager'
 import { StatusPanel } from '../components/ui/status-panel'
+import { LevelUpManager } from '../components/levelup-manager'
+import { SKILLS, SkillKeys } from '../data/skills'
 
 export default class Main extends Phaser.Scene {
   ball?: Ball
@@ -20,6 +22,8 @@ export default class Main extends Phaser.Scene {
   statsManager?: StatsManager
   collisionManager?: CollisionManager
   statusPanel?: StatusPanel
+  levelUpManager?: LevelUpManager
+  pendingSkill?: SkillKeys
 
   constructor() {
     super('GameScene')
@@ -33,6 +37,12 @@ export default class Main extends Phaser.Scene {
     this.load.image('peagun', 'assets/weapons/peagun.svg')
     this.load.image('level-icon', 'assets/level-icon.svg')
     this.load.image('hp-chunk', 'assets/hp-chunk.svg')
+  }
+
+  init(skill: { skillKey: SkillKeys }) {
+    if (skill.skillKey) {
+      this.pendingSkill = skill.skillKey
+    }
   }
 
   create() {
@@ -72,8 +82,12 @@ export default class Main extends Phaser.Scene {
     this.statsManager = new StatsManager(this)
     this.collisionManager = new CollisionManager(this)
     this.statusPanel = new StatusPanel(this, 3)
-
+    this.levelUpManager = new LevelUpManager(this)
     this.bindEvents()
+
+    if (this.pendingSkill) {
+      this.ball.skills.push(this.pendingSkill)
+    }
   }
 
   update(): void {
@@ -170,10 +184,15 @@ export default class Main extends Phaser.Scene {
       this.statusPanel?.decreaseHp()
     })
 
+    this.events.on('hp-restored', () => {
+      this.statusPanel?.restoreHp()
+    })
+
     this.events.on('level-up', () => {
       this.statusPanel?.gainLevel()
       this.scene.pause()
-      this.scene.launch('level-up')
+      const skillset = this.levelUpManager?.getRandomSkillset()
+      this.scene.launch('level-up', { skills: skillset })
     })
   }
 }

@@ -1,19 +1,24 @@
 import { Modal } from '../components/ui/modal'
 import { Skillset } from '../components/ui/skillset'
 import { SKILLS } from '../data/skills'
+import Main from './Main'
 
 export class LevelUp extends Phaser.Scene {
   modal?: Phaser.GameObjects.Container
+  skillset: Array<keyof typeof SKILLS> = []
 
   constructor() {
     super('level-up')
   }
 
+  init(skillset: { skills: Array<keyof typeof SKILLS> }) {
+    this.skillset = skillset.skills
+  }
+
   preload() {
-    this.load.image('peagun', 'assets/weapons/peagun.svg')
-    this.load.image('bulky', 'assets/skills/bulky.svg')
-    this.load.image('evasive', 'assets/skills/evasive.svg')
-    this.load.image('sharpshooter', 'assets/skills/sharpshooter.svg')
+    this.skillset.forEach(el => {
+      this.load.image(el, `assets/skills/${el}.svg`)
+    })
   }
 
   create() {
@@ -33,7 +38,7 @@ export class LevelUp extends Phaser.Scene {
       scene: this,
       x: 0,
       y: top + 140,
-      skills: ['bulky', 'evasive', 'sharpshooter'],
+      skills: this.skillset ?? [],
     })
 
     skillSet.setX(-skillSet.width / 2)
@@ -56,8 +61,11 @@ export class LevelUp extends Phaser.Scene {
       duration: 400,
       alpha: { from: 1, to: 0.4 },
       onComplete: () => {
+        const mainScene = this.scene.get('GameScene') as Main
+        mainScene.ball?.skills.push(skillKey)
+        mainScene.levelUpManager?.updateBallStats(skillKey)
         this.scene.stop('level-up')
-        this.scene.run('GameScene', { skillKey })
+        this.scene.run('GameScene')
       },
     })
   }
