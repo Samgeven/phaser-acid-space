@@ -165,7 +165,7 @@ export default class Main extends Phaser.Scene {
 
   bindEvents() {
     this.events.on('enemy-killed', (bounty: number) => {
-      if (this.statsManager?.enemyKillCount) {
+      if (this.statsManager) {
         this.statsManager.enemyKillCount += 1
       }
       this.statusPanel?.gainExp(bounty)
