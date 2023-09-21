@@ -1,39 +1,51 @@
-import { COLLISION_CATEGORIES } from "../data/collision";
-import Main from "../scenes/Main";
-import { Enemy } from "./enemy";
+import { COLLISION_CATEGORIES } from '../data/collision'
+import Main from '../scenes/Main'
+import { Enemy } from './enemy'
+
+type ProjectileConfig = {
+  scene: Main
+  angle: number
+  startingPoint: { x: number; y: number }
+  lifespan: number
+  speed: number
+}
 
 export class Projectile {
   body: Phaser.Physics.Matter.Image
   scene: Main
-  constructor(scene: Main, angle: number, startingPoint: {x: number, y: number}) {
+  constructor(config: ProjectileConfig) {
+    const { scene, angle, startingPoint, lifespan, speed } = config
     const { x, y } = startingPoint
 
-    const projSprite = scene.add.image(x, y, 'particle')
+    const wrapper = scene.add.container(x, y)
+    const light = scene.add.pointlight(0, 0, 0xFF3688, 12, 0.5, 0.05)
+    const projSprite = scene.add.image(0, 0, 'particle')
+    wrapper.add([light, projSprite])
+
     const projBody = scene.matter.add.circle(x, y, 10, {
       collisionFilter: {
         category: COLLISION_CATEGORIES.PROJECTILES,
-        mask: COLLISION_CATEGORIES.ENEMIES | COLLISION_CATEGORIES.WALLS
+        mask: COLLISION_CATEGORIES.ENEMIES | COLLISION_CATEGORIES.WALLS,
       },
       mass: 10,
-      label: 'projectile'
+      label: 'projectile',
     })
-    const projectile = scene.matter.add.gameObject(projSprite, projBody) as Phaser.Physics.Matter.Image
+    const projectile = scene.matter.add.gameObject(wrapper, projBody) as Phaser.Physics.Matter.Image
     this.body = projectile
     this.scene = scene
+
     projectile.setIgnoreGravity(true)
-
-    // Set the velocity of the projectile to move in the direction of the cursor
-    var speed = 25; // Adjust the speed of the projectile
     projectile.setVelocity(speed * Math.cos(angle), speed * Math.sin(angle))
+    projectile.setOnCollide(
+      (e: Phaser.Types.Physics.Matter.MatterCollisionData) => this.scene.collisionManager?.handleInteractions(e)
+    )
 
-    projectile.setOnCollide((e: Phaser.Types.Physics.Matter.MatterCollisionData) => this.scene.collisionManager?.handleInteractions(e))
-
-    scene.time.delayedCall(1500, () => {
+    scene.time.delayedCall(lifespan, () => {
       scene.tweens.add({
         alpha: 0,
-        duration: 400,
+        duration: 100,
         onComplete: () => projectile?.destroy(),
-        targets: [projectile]
+        targets: [projectile],
       })
     })
   }

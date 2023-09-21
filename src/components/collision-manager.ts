@@ -4,12 +4,12 @@ export class CollisionManager {
     BALL: 1,
     ENEMIES: 2,
     PROJECTILES: 4,
-    WALLS: 8
+    WALLS: 8,
   }
   INTERACTIONS = {
     UNNKNOWN: 0,
     BALL_AND_ENEMY: 1,
-    PROJECTILE_AND_ENEMY: 2
+    PROJECTILE_AND_ENEMY: 2,
   }
 
   constructor(scene: Phaser.Scene) {
@@ -33,7 +33,6 @@ export class CollisionManager {
 
   handleInteractions(e: Phaser.Types.Physics.Matter.MatterCollisionData) {
     const interactionType = this.detectGroup(e)
-    console.log(interactionType)
 
     if (interactionType === this.INTERACTIONS.UNNKNOWN) {
       return
@@ -61,7 +60,7 @@ export class CollisionManager {
         onComplete: () => {
           bodyA?.destroy()
         },
-        targets: [bodyA]
+        targets: [bodyA],
       })
     }
   }

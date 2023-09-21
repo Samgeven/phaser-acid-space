@@ -1,11 +1,12 @@
-import { COLLISION_CATEGORIES } from "../data/collision";
-import { Ball } from "./ball";
+import { COLLISION_CATEGORIES } from '../data/collision'
+import { Ball } from './ball'
 
 export class Enemy extends Phaser.Physics.Matter.Image {
   speed: number = 2
   isFading: boolean = false
   emitterConfig: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
   isDisabled: boolean = false
+  killBounty: number = 12
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene.matter.world, x, y, 'shell', undefined, {
@@ -14,10 +15,11 @@ export class Enemy extends Phaser.Physics.Matter.Image {
         mask: COLLISION_CATEGORIES.BALL | COLLISION_CATEGORIES.PROJECTILES,
       },
       label: 'enemy',
-      mass: 2
+      mass: 2,
+      isSensor: true,
     })
-    
-    this.scene = scene;
+
+    this.scene = scene
     this.setIgnoreGravity(true)
     this.setName('enemy')
 
@@ -33,17 +35,17 @@ export class Enemy extends Phaser.Physics.Matter.Image {
       blendMode: 'ADD',
       timeScale: 0.6,
       follow: this,
-      tint: 0x3D4E,
+      tint: 0x3d4e,
     }
     // Add the enemy to the scene
-    scene.add.existing(this);
+    scene.add.existing(this)
   }
 
   setFading() {
     this.isFading = true
     this.setCollisionCategory(5)
     this.setCollisionGroup(5)
-    this.scene.events.emit('enemy-killed')
+    this.scene.events.emit('enemy-killed', this.killBounty)
 
     const particles = this.scene.add.particles('particle')
     const emitter = particles.createEmitter(this.emitterConfig)
@@ -72,14 +74,14 @@ export class Enemy extends Phaser.Physics.Matter.Image {
       return
     }
 
-    const playerX = player.x;
-    const playerY = player.y;
+    const playerX = player.x
+    const playerY = player.y
 
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, playerX, playerY);
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, playerX, playerY)
 
-    const velocityX = Math.cos(angle) * this.speed;
-    const velocityY = Math.sin(angle) * this.speed;
+    const velocityX = Math.cos(angle) * this.speed
+    const velocityY = Math.sin(angle) * this.speed
 
-    this.setVelocity(velocityX, velocityY);
+    this.setVelocity(velocityX, velocityY)
   }
 }

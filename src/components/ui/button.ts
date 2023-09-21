@@ -2,20 +2,20 @@ const STYLE_PRESETS = Object.freeze({
   SM: {
     PAD_X: 32,
     PAD_Y: 16,
-    FONT_SIZE: '24px'
+    FONT_SIZE: '24px',
   },
   LG: {
     PAD_X: 48,
     PAD_Y: 24,
-    FONT_SIZE: '32px'
-  }
+    FONT_SIZE: '32px',
+  },
 })
 
 type ButtonConfig = {
-  scene: Phaser.Scene,
-  x: number,
-  y: number,
-  text: string,
+  scene: Phaser.Scene
+  x: number
+  y: number
+  text: string
   clickHandler: () => void
   style?: keyof typeof STYLE_PRESETS
 }
@@ -27,16 +27,17 @@ export class Button extends Phaser.GameObjects.Container {
     super(scene, x, y)
 
     const textNode = scene.add.text(0, 0, text, { fontSize: FONT_SIZE, fontFamily: 'Arial' }).setOrigin(0.5)
-    const rect = scene.add.rectangle(0, 0, textNode.width + PAD_X, textNode.height + PAD_Y, 0xFF2929)
+    const rect = scene.add.rectangle(0, 0, textNode.width + PAD_X, textNode.height + PAD_Y, 0xff3688)
 
-    rect.setInteractive()
+    rect
+      .setInteractive()
       .on('pointerdown', () => clickHandler())
       .on('pointerover', () => {
         scene.tweens.add({
           targets: this,
           alpha: 0.7,
           duration: 300,
-          yoyo: true
+          yoyo: true,
         })
       })
 

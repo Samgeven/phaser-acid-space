@@ -1,13 +1,14 @@
-import { Button } from "../components/ui/button"
+import { Button } from '../components/ui/button'
+import { Modal } from '../components/ui/modal'
 
 type Stats = {
-  timePassed: number, 
+  timePassed: number
   enemiesKilled: number
 }
 export class GameOver extends Phaser.Scene {
   stats: Stats = {
     timePassed: 0,
-    enemiesKilled: 0
+    enemiesKilled: 0,
   }
 
   constructor() {
@@ -19,21 +20,23 @@ export class GameOver extends Phaser.Scene {
   }
 
   create() {
-    const wrap = this.add.container(this.game.scale.width / 2, this.game.scale.height / 2)
-    const rect = this.add.rectangle(0, 0, 400, 300, 0x464e93)
-    const title = this.add.text(0, -100, 'Game over!', {fontSize: '36px', fontFamily: 'Arial'}).setOrigin(0.5)
+    const modal = new Modal({
+      scene: this,
+    })
+    const title = this.add.text(0, -100, 'Game over!', { fontSize: '36px', fontFamily: 'Arial' }).setOrigin(0.5)
 
     const time = new Date(Date.now() - this.stats.timePassed)
 
-    const enemyScore = this.add.text(
-      wrap.width / 2 - 100, -60, 
-      `Enemies killed: ${this.stats?.enemiesKilled}`, 
-      {fontSize: '24px', fontFamily: 'Arial', align: 'left'}
-    )
+    const enemyScore = this.add.text(modal.width / 2 - 100, -60, `Enemies killed: ${this.stats?.enemiesKilled}`, {
+      fontSize: '24px',
+      fontFamily: 'Arial',
+      align: 'left',
+    })
     const timeScore = this.add.text(
-      wrap.width / 2 - 100, -28,
-      `Time survived: ${time.getMinutes()}:${time.getSeconds()}`, 
-      {fontSize: '24px', fontFamily: 'Arial', align: 'left'}
+      modal.width / 2 - 100,
+      -28,
+      `Time survived: ${time.getMinutes()}:${time.getSeconds()}`,
+      { fontSize: '24px', fontFamily: 'Arial', align: 'left' }
     )
 
     const button = new Button({
@@ -44,13 +47,13 @@ export class GameOver extends Phaser.Scene {
       clickHandler: () => this.scene.start('GameScene'),
     })
 
-    wrap.add([rect, title, button, enemyScore, timeScore])
+    modal.add([title, button, enemyScore, timeScore])
 
     this.add.tween({
-      targets: wrap,
+      targets: modal,
       scale: { from: 3, to: 1 },
       duration: 400,
-      alpha: { from: 0.4, to: 1 }
+      alpha: { from: 0.4, to: 1 },
     })
   }
 }
