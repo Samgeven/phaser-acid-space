@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "prettier-format": "prettier --config .prettierrc.cjs 'src/**/*.ts' --write"
+    "prettier-format": "prettier --config .prettierrc.cjs 'src/**/*.ts' --write",
+    "deploy": "gh-pages -d public"
   },
   "devDependencies": {
     "gh-pages": "^6.0.0",
